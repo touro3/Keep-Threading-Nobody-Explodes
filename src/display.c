@@ -5,19 +5,18 @@
 #include "module_board.h"
 
 void inicializa_display() {
-    initscr();           // Inicializa a tela
-    start_color();       // Habilita cores
+    initscr();
+    start_color();
     init_pair(1, COLOR_WHITE, COLOR_BLUE);
-    noecho();            // Não mostra as teclas digitadas
-    cbreak();            // Entrada sem esperar Enter
+    noecho();
+    cbreak();
 }
 
 void encerra_display() {
-    endwin(); // Finaliza a interface ncurses
+    endwin();
 }
 
 void *display_func(void *args) {
-    (void)args; // Evita aviso de parâmetro não usado
     while (1) {
         pthread_mutex_lock(&module_queue_lock);
         clear();
@@ -36,11 +35,12 @@ void *display_func(void *args) {
 
         int line = 5;
         for (int i = 0; i < num_modules; i++) {
-            mvprintw(line++, 0, "Módulo %d | Status: %s | Tempo: %d",
+            mvprintw(line++, 0, "Módulo %d | Tipo: %c | Status: %s | Interações/Tempo: %d",
                      module_queue[i].id,
+                     module_queue[i].type,
                      module_queue[i].status == PENDING ? "Pendente" :
                      module_queue[i].status == IN_PROGRESS ? "Em progresso" : "Desarmado",
-                     module_queue[i].disarm_time);
+                     module_queue[i].interactions);
         }
 
         refresh();

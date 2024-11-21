@@ -9,36 +9,34 @@ Module module_queue[MAX_MODULES];
 int num_modules = 0;
 
 void *module_board_func(void *args) {
-    (void)args;
     while (1) {
-        sleep(2); // Gera um módulo a cada 2 segundos
+        sleep(2); // Geração fixa de módulos
         pthread_mutex_lock(&module_queue_lock);
+
         if (num_modules < MAX_MODULES) {
             Module new_module = {
                 .id = rand() % 1000,
-                .type = rand() % 3,
-                .disarm_time = rand() % 5 + 1,
+                .bench_id = rand() % 3,
                 .status = PENDING
             };
+
+            int type_choice = rand() % 3;
+            if (type_choice == 0) {
+                new_module.type = 'x'; // Pressionar botões
+                new_module.interactions = rand() % 5 + 1; // 1-5 interações
+            } else if (type_choice == 1) {
+                new_module.type = 'c'; // Inserir sequência
+                new_module.interactions = strlen("abc");
+                strcpy(new_module.sequence, "abc"); // Sequência fixa
+            } else {
+                new_module.type = 't'; // Temporizador fixo
+                new_module.interactions = 5; // 5 segundos fixos
+            }
+
             module_queue[num_modules++] = new_module;
-            printf("Novo módulo gerado! ID: %d, Tipo: %d, Tempo: %d\n",
-                   new_module.id, new_module.type, new_module.disarm_time);
         }
+
         pthread_mutex_unlock(&module_queue_lock);
     }
     return NULL;
-}
-
-Module assign_module_to_tedax(int tedax_id) {
-    pthread_mutex_lock(&module_queue_lock);
-    for (int i = 0; i < num_modules; i++) {
-        if (module_queue[i].status == PENDING) {
-            module_queue[i].status = IN_PROGRESS;
-            pthread_mutex_unlock(&module_queue_lock);
-            return module_queue[i];
-        }
-    }
-    pthread_mutex_unlock(&module_queue_lock);
-    Module empty = { .id = -1 }; // Retorna módulo inválido se não houver disponível
-    return empty;
 }
