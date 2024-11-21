@@ -11,12 +11,10 @@
 
 #define NUM_TEDAX 3
 
-
 int main() {
     pthread_t module_board_thread, display_thread, tedax_threads[NUM_TEDAX];
 
-    inicializa_bancadas(2); // Inicializa 2 bancadas
-    inicializa_display();
+    inicializa_display(); // Inicializa a interface ncurses
 
     pthread_create(&module_board_thread, NULL, module_board_func, NULL);
     pthread_create(&display_thread, NULL, display_func, NULL);
@@ -27,11 +25,11 @@ int main() {
 
     pthread_join(module_board_thread, NULL);
     pthread_join(display_thread, NULL);
+
     for (int i = 0; i < NUM_TEDAX; i++) {
         pthread_join(tedax_threads[i], NULL);
     }
 
-    encerra_bancadas();
-    encerra_display();
+    encerra_display(); // Finaliza a interface ncurses
     return 0;
 }

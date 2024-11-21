@@ -3,10 +3,9 @@
 
 #include <pthread.h>
 
-// Constantes
 #define MAX_MODULES 10
+#define NUM_TEDAX 3
 
-// Tipos
 typedef enum {
     PENDING,
     IN_PROGRESS,
@@ -27,6 +26,6 @@ extern int num_modules;
 
 // Funções
 void *module_board_func(void *args); // Thread que gera módulos
-Module get_next_module();           // Recupera o próximo módulo pendente
+Module assign_module_to_tedax(int tedax_id); // Atribui módulo para desarme
 
 #endif

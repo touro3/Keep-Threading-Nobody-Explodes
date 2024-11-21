@@ -29,8 +29,7 @@ void *module_board_func(void *args) {
     return NULL;
 }
 
-
-Module get_next_module() {
+Module assign_module_to_tedax(int tedax_id) {
     pthread_mutex_lock(&module_queue_lock);
     for (int i = 0; i < num_modules; i++) {
         if (module_queue[i].status == PENDING) {
@@ -40,6 +39,6 @@ Module get_next_module() {
         }
     }
     pthread_mutex_unlock(&module_queue_lock);
-    Module empty = { .id = -1 }; // Retorna um módulo inválido se nenhum estiver disponível
+    Module empty = { .id = -1 }; // Retorna módulo inválido se não houver disponível
     return empty;
 }

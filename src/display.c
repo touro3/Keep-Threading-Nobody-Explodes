@@ -1,5 +1,6 @@
 #include <ncurses.h>
 #include <unistd.h> 
+#include <stdlib.h>
 #include "display.h"
 #include "module_board.h"
 
@@ -11,19 +12,40 @@ void inicializa_display() {
     cbreak();            // Entrada sem esperar Enter
 }
 
-void *display_func(void *args) {
-    (void)args; // Para evitar warnings sobre o parâmetro não utilizado
-    while (1) {
-        clear();
-        mvprintw(0, 0, "Status do Jogo:");
-        mvprintw(1, 0, "Módulos pendentes: ...");
-        mvprintw(2, 0, "Tedax disponíveis: ...");
-        refresh();
-        sleep(1); // Atualiza a cada segundo
-    }
-    return NULL;
-}
-
 void encerra_display() {
     endwin(); // Finaliza a interface ncurses
+}
+
+void *display_func(void *args) {
+    (void)args; // Evita aviso de parâmetro não usado
+    while (1) {
+        pthread_mutex_lock(&module_queue_lock);
+        clear();
+        mvprintw(0, 0, "Status do Jogo:");
+        int pending = 0, in_progress = 0, disarmed = 0;
+
+        for (int i = 0; i < num_modules; i++) {
+            if (module_queue[i].status == PENDING) pending++;
+            else if (module_queue[i].status == IN_PROGRESS) in_progress++;
+            else disarmed++;
+        }
+
+        mvprintw(1, 0, "Módulos pendentes: %d", pending);
+        mvprintw(2, 0, "Módulos em progresso: %d", in_progress);
+        mvprintw(3, 0, "Módulos desarmados: %d", disarmed);
+
+        int line = 5;
+        for (int i = 0; i < num_modules; i++) {
+            mvprintw(line++, 0, "Módulo %d | Status: %s | Tempo: %d",
+                     module_queue[i].id,
+                     module_queue[i].status == PENDING ? "Pendente" :
+                     module_queue[i].status == IN_PROGRESS ? "Em progresso" : "Desarmado",
+                     module_queue[i].disarm_time);
+        }
+
+        refresh();
+        pthread_mutex_unlock(&module_queue_lock);
+        sleep(1);
+    }
+    return NULL;
 }
