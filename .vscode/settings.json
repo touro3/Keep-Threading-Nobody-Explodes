@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "bench.h": "c"
+        "bench.h": "c",
+        "coordinator.h": "c"
     }
 }

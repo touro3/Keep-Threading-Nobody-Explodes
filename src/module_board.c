@@ -9,6 +9,7 @@ Module module_queue[MAX_MODULES];
 int num_modules = 0;
 
 void *module_board_func(void *args) {
+    (void)args;
     while (1) {
         sleep(2); // Gera um módulo a cada 2 segundos
         pthread_mutex_lock(&module_queue_lock);

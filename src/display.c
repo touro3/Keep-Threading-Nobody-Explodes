@@ -1,4 +1,5 @@
 #include <ncurses.h>
+#include <unistd.h> 
 #include "display.h"
 #include "module_board.h"
 

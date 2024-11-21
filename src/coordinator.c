@@ -3,6 +3,7 @@
 #include "coordinator.h"
 
 void *coordinator_func(void *args) {
+    (void)args;
     while (1) {
         int module_id, tedax_id, bench_id;
         mvprintw(5, 0, "Escolha módulo, Tedax e bancada (M T B): ");
