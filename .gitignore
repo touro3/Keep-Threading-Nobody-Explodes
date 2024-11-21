@@ -1,0 +1,6 @@
+# Ignorar diretórios de objetos
+obj/
+bin/
+
+# Ignorar todos os arquivos com extensão .o
+*.o
