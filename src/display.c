@@ -4,15 +4,15 @@
 #include "module_board.h"
 
 void inicializa_display() {
-    initscr();
-    start_color();
+    initscr();           // Inicializa a tela
+    start_color();       // Habilita cores
     init_pair(1, COLOR_WHITE, COLOR_BLUE);
-    noecho();
-    cbreak();
+    noecho();            // Não mostra as teclas digitadas
+    cbreak();            // Entrada sem esperar Enter
 }
 
 void *display_func(void *args) {
-    (void)args; // Evita aviso de parâmetro não usado
+    (void)args; // Para evitar warnings sobre o parâmetro não utilizado
     while (1) {
         clear();
         mvprintw(0, 0, "Status do Jogo:");
@@ -25,5 +25,5 @@ void *display_func(void *args) {
 }
 
 void encerra_display() {
-    endwin();
+    endwin(); // Finaliza a interface ncurses
 }
