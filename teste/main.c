@@ -1,42 +1,30 @@
-#include <pthread.h>
-#include <ncurses.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include "bench.h"
-#include "coordinator.h"
-#include "display.h"
-#include "module_board.h"
-#include "tedax.h"
-
-#define NUM_TEDAX 3
-#define NUM_BENCHES 3
+#define MAX_BENCHES 5
+#define MAX_TEDAX 10
 
 int main() {
-    pthread_t module_board_thread, display_thread, tedax_threads[NUM_TEDAX], coordinator_thread;
+    int num_benches = 3; // Número inicial de bancadas
+    int num_tedax = 5;   // Número inicial de Tedax
 
-    inicializa_display();
-    inicializa_bancadas(NUM_BENCHES);
+    printf("Digite o número de Tedax (máx %d): ", MAX_TEDAX);
+    scanf("%d", &num_tedax);
+    if (num_tedax > MAX_TEDAX) num_tedax = MAX_TEDAX;
 
-    // Cria as threads
-    pthread_create(&module_board_thread, NULL, module_board_func, NULL);
-    pthread_create(&display_thread, NULL, display_func, NULL);
-    pthread_create(&coordinator_thread, NULL, coordinator_func, NULL);
+    printf("Digite o número de bancadas (máx %d): ", MAX_BENCHES);
+    scanf("%d", &num_benches);
+    if (num_benches > MAX_BENCHES) num_benches = MAX_BENCHES;
 
-    for (int i = 0; i < NUM_TEDAX; i++) {
+    inicializa_bancadas(num_benches);
+
+    pthread_t tedax_threads[num_tedax];
+    for (int i = 0; i < num_tedax; i++) {
         pthread_create(&tedax_threads[i], NULL, tedax_func, (void *)(intptr_t)i);
     }
 
-    // Aguarda o término das threads
-    pthread_join(module_board_thread, NULL);
-    pthread_join(display_thread, NULL);
-    pthread_join(coordinator_thread, NULL);
-    for (int i = 0; i < NUM_TEDAX; i++) {
+    // Aguarda o término das threads Tedax
+    for (int i = 0; i < num_tedax; i++) {
         pthread_join(tedax_threads[i], NULL);
     }
 
-    encerra_display();
     encerra_bancadas();
     return 0;
 }
