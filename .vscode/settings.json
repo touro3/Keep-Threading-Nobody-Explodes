@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "bench.h": "c",
-        "coordinator.h": "c"
+        "coordinator.h": "c",
+        "tedax.h": "c",
+        "module_board.h": "c"
     }
 }

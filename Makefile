@@ -1,47 +1,42 @@
-# Compilador e flags
+# Compiler and flags
 CC = gcc
 CFLAGS = -Wall -Wextra -pthread -std=c11
 
-# Diretórios
+# Directories
 SRCDIR = src
-INCDIR = includes
 OBJDIR = obj
 BINDIR = bin
 
-# Arquivos do projeto
-SOURCES = $(wildcard $(SRCDIR)/*.c)
-OBJECTS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SOURCES))
+# Target binary
 TARGET = $(BINDIR)/game
 
-# Regras principais
+# Source and object files
+SOURCES = $(wildcard $(SRCDIR)/*.c)
+OBJECTS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SOURCES))
+
+# Rules
 all: setup $(TARGET)
 
 $(TARGET): $(OBJECTS)
 	@echo "Linkando o programa..."
-	$(CC) -o $@ $^ -lncurses -pthread
+	$(CC) $(CFLAGS) -o $@ $^ -lncurses
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
+	@mkdir -p $(OBJDIR)
 	@echo "Compilando $<..."
-	$(CC) $(CFLAGS) -I$(INCDIR) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
-# Criação dos diretórios
 setup:
-	@mkdir -p $(OBJDIR) $(BINDIR)
+	@mkdir -p $(BINDIR)
 
-# Limpeza dos arquivos gerados
+run: $(TARGET)
+	@echo "Iniciando o jogo..."
+	./$(TARGET)
+
 clean:
 	@echo "Limpando arquivos compilados..."
-	rm -rf $(OBJDIR)/*.o $(BINDIR)/game
+	rm -rf $(OBJDIR)/*.o $(TARGET)
 
-# Limpeza completa
 distclean: clean
-	@echo "Removendo diretórios gerados..."
+	@echo "Removendo diretórios..."
 	rm -rf $(OBJDIR) $(BINDIR)
-
-# Ajuda
-help:
-	@echo "Comandos disponíveis:"
-	@echo "  make          - Compila o projeto"
-	@echo "  make clean    - Remove os arquivos objetos e binários"
-	@echo "  make distclean - Remove os diretórios gerados"
-	@echo "  make help     - Mostra esta ajuda"
