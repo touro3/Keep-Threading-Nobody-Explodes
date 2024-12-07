@@ -1,24 +1,26 @@
+#include "module_board.h" // Deve vir primeiro, pois define ModuleStatus
+#include "utils.h"        // Depende de module_board.h
+#include "tedax.h"
+#include "coordinator.h"
 #include <ncurses.h>
 #include <pthread.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <semaphore.h>
-#include "coordinator.h"
-#include "module_board.h"
-#include "tedax.h"
+#include <unistd.h>
 
-// Semáforo global para controlar o input
 extern sem_t input_ready;
 
 void *coordinator_func(void *args) {
+    (void)args;
+    char status_message[256] = "";
+    int message_timer = 0;
+
     while (1) {
-        sem_wait(&input_ready); // Espera até que um módulo esteja disponível para ser atribuído
+        sem_wait(&input_ready); // Aguarda sinal de input
 
         pthread_mutex_lock(&module_queue_lock);
         int pending_index = -1;
 
-        // Procura um módulo pendente na fila
+        // Localiza um módulo pendente
         for (int i = 0; i < num_modules; i++) {
             if (module_queue[i].status == PENDING) {
                 pending_index = i;
@@ -28,17 +30,19 @@ void *coordinator_func(void *args) {
         pthread_mutex_unlock(&module_queue_lock);
 
         if (pending_index == -1) {
-            sem_post(&input_ready); // Libera o semáforo se não houver módulos
+            snprintf(status_message, sizeof(status_message),
+                     "Nenhum módulo pendente.");
+            message_timer = 3;
             sleep(1);
             continue;
         }
 
-        // Solicita o input do jogador usando ncurses
-        clear();
-        mvprintw(0, 0, "Módulo ID: %d disponível. Escolha Tedax (0-%d): ", module_queue[pending_index].id, NUM_TEDAX - 1);
+        // Solicita o input do jogador
+        mvprintw(LINES - 3, 0, "Módulo %d disponível. Escolha Tedax (0-%d): ",
+                 module_queue[pending_index].id, NUM_TEDAX - 1);
         refresh();
 
-        int tedax_input = getch() - '0'; // Lê o input do usuário em tempo real
+        int tedax_input = getch() - '0';
 
         if (tedax_input >= 0 && tedax_input < NUM_TEDAX) {
             pthread_mutex_lock(&tedax_list[tedax_input].lock);
@@ -49,20 +53,34 @@ void *coordinator_func(void *args) {
                 module_queue[pending_index].bench_id = tedax_input;
                 pthread_mutex_unlock(&module_queue_lock);
 
-                tedax_list[tedax_input].is_available = 0; // Marca o Tedax como ocupado
-                mvprintw(2, 0, "Módulo %d atribuído ao Tedax %d!", module_queue[pending_index].id, tedax_input);
+                tedax_list[tedax_input].is_available = 0;
+                snprintf(status_message, sizeof(status_message),
+                         "Módulo %d atribuído ao Tedax %d!",
+                         module_queue[pending_index].id, tedax_input);
+                message_timer = 3;
             } else {
-                mvprintw(2, 0, "Tedax %d está ocupado!", tedax_input);
+                snprintf(status_message, sizeof(status_message),
+                         "Tedax %d está ocupado!", tedax_input);
+                message_timer = 3;
             }
 
             pthread_mutex_unlock(&tedax_list[tedax_input].lock);
         } else {
-            mvprintw(2, 0, "Entrada inválida!");
+            snprintf(status_message, sizeof(status_message),
+                     "Entrada inválida!");
+            message_timer = 3;
         }
 
         refresh();
-        sem_post(&input_ready); // Libera para outro input
-        sleep(1);
+
+        // Exibe a mensagem temporária
+        if (message_timer > 0) {
+            mvprintw(LINES - 2, 0, "%s", status_message);
+            refresh();
+            sleep(1);
+            message_timer--;
+        }
+        sem_post(&input_ready);
     }
     return NULL;
 }

@@ -3,6 +3,7 @@
         "bench.h": "c",
         "coordinator.h": "c",
         "tedax.h": "c",
-        "module_board.h": "c"
+        "module_board.h": "c",
+        "semaphore.h": "c"
     }
 }
