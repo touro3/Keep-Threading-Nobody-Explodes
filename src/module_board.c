@@ -41,9 +41,7 @@ void *module_board_func(void *args) {
             }
 
             module_queue[num_modules++] = new_module;
-            mvprintw(10, 0, "Novo módulo criado: ID %d, Tipo %c\n", new_module.id, new_module.type);
-            refresh();
-            sleep(2); // Exibe a mensagem por 2 segundos
+            printf("Novo módulo criado: ID %d, Tipo %c\n", new_module.id, new_module.type);
         }
 
         pthread_mutex_unlock(&module_queue_lock);
