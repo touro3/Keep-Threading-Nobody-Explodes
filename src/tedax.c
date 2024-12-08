@@ -1,5 +1,6 @@
 #include "tedax.h"
 #include "module_board.h"
+#include "utils.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <pthread.h>
@@ -36,6 +37,7 @@ void *tedax_func(void *args) {
     while (1) {
         Module *assigned_module = NULL;
 
+        // Verifica se há um módulo atribuído ao Tedax
         pthread_mutex_lock(&module_queue_lock);
         for (int i = 0; i < num_modules; i++) {
             if (module_queue[i].status == IN_PROGRESS && module_queue[i].bench_id == tedax_id) {
@@ -46,44 +48,52 @@ void *tedax_func(void *args) {
         pthread_mutex_unlock(&module_queue_lock);
 
         if (assigned_module != NULL) {
-            mvprintw(15 + tedax_id, 0, "Tedax %d desarmando módulo %d...\n", tedax_id, assigned_module->id);
+            // Atualiza a ação do Tedax para desarmando o módulo
+            pthread_mutex_lock(&tedax_action_lock);
+            snprintf(tedax_actions[tedax_id], sizeof(tedax_actions[tedax_id]),
+                     "Tedax %d desarmando módulo %d...", tedax_id, assigned_module->id);
+            pthread_mutex_unlock(&tedax_action_lock);
             refresh();
 
+            // Processa o módulo
             if (assigned_module->type == 'x') {
                 for (int i = 0; i < assigned_module->interactions; i++) {
-                    mvprintw(15 + tedax_id, 0, "Tedax %d pressionando botão %d/%d...",
-                             tedax_id, i + 1, assigned_module->interactions);
-                    refresh();
-                    sleep(1);
+                    sleep(1); // Simula o tempo de processamento
                 }
             } else if (assigned_module->type == 'c') {
                 for (int i = 0; i < assigned_module->interactions; i++) {
-                    mvprintw(15 + tedax_id, 0, "Tedax %d inserindo '%c'...",
-                             tedax_id, assigned_module->sequence[i]);
-                    refresh();
-                    sleep(1);
+                    sleep(1); // Simula o tempo de processamento
                 }
             } else if (assigned_module->type == 't') {
-                mvprintw(15 + tedax_id, 0, "Tedax %d esperando %d segundos...",
-                         tedax_id, assigned_module->interactions);
-                refresh();
-                sleep(assigned_module->interactions);
+                sleep(assigned_module->interactions); // Simula o tempo de espera
             }
 
+            // Marca o módulo como desarmado
             pthread_mutex_lock(&module_queue_lock);
             assigned_module->status = DISARMED;
             pthread_mutex_unlock(&module_queue_lock);
 
-            mvprintw(15 + tedax_id, 0, "Tedax %d desarmou módulo %d com sucesso!",
-                     tedax_id, assigned_module->id);
+            // Atualiza a mensagem de sucesso e redefine como disponível
+            pthread_mutex_lock(&tedax_action_lock);
+            snprintf(tedax_actions[tedax_id], sizeof(tedax_actions[tedax_id]),
+                     "Tedax %d: Disponível", tedax_id);
+            pthread_mutex_unlock(&tedax_action_lock);
             refresh();
-            sleep(2);
 
+            // Marca o Tedax como disponível novamente
             pthread_mutex_lock(&tedax_list[tedax_id].lock);
             tedax_list[tedax_id].is_available = 1;
             pthread_mutex_unlock(&tedax_list[tedax_id].lock);
+        } else {
+            // Se não há módulos atribuídos, o Tedax permanece disponível
+            pthread_mutex_lock(&tedax_action_lock);
+            snprintf(tedax_actions[tedax_id], sizeof(tedax_actions[tedax_id]),
+                     "Tedax %d: Disponível", tedax_id);
+            pthread_mutex_unlock(&tedax_action_lock);
+            refresh();
+            sleep(1);
         }
-        sleep(1);
     }
+
     return NULL;
 }
