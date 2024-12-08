@@ -5,7 +5,9 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdlib.h> // Para evitar warnings sobre exit()
 
+// Função para inicializar o display
 void inicializa_display() {
     initscr();
     cbreak();
@@ -21,16 +23,15 @@ void inicializa_display() {
     refresh();
 }
 
+// Função para encerrar o display
 void encerra_display() {
     endwin();
 }
 
+// Função que será executada pela thread de display
 void *display_func(void *args) {
-    (void)args;
-    initscr();
-    cbreak();
-    noecho();
-    curs_set(0);
+    (void)args; // Evita warnings com argumentos não utilizados
+    inicializa_display();
 
     while (1) {
         clear();
@@ -41,6 +42,16 @@ void *display_func(void *args) {
         mvprintw(2, 0, "| Módulos em progresso: %d", count_modules(IN_PROGRESS));
         mvprintw(3, 0, "| Módulos desarmados: %d", count_modules(DISARMED));
         mvprintw(4, 0, "+----------------------------------------------------------+");
+
+        // Verifica se todos os módulos foram desarmados
+        if (count_modules(DISARMED) == 10) { // Considerando 10 módulos no total
+            clear();
+            mvprintw(10, 10, "Parabéns! Todos os módulos foram desarmados com sucesso!");
+            refresh();
+            sleep(3); // Dá tempo para o jogador ver a mensagem
+            encerra_display(); // Encerra o modo ncurses
+            exit(0);           // Sai do programa
+        }
 
         // Painel de Lista de Módulos
         mvprintw(6, 0, "+---------------------- Lista de Módulos -------------------+");
@@ -78,6 +89,6 @@ void *display_func(void *args) {
         sleep(1); // Atualização periódica
     }
 
-    endwin();
+    encerra_display();
     return NULL;
 }
