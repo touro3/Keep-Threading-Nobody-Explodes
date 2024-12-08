@@ -10,7 +10,7 @@ Para o trabalho final da disciplina, foi requerido a criação de um sistema que
 ## Explicação e mecânica do jogo
 O jogo simula uma situação de emergência onde se deve desarmar uma bomba antes do término do tempo, ela contém diferentes tipos de módulos explosivos e um número limitado de bancadas. É preciso um grande nível de coordenação para que o jogador consiga cumprir com o objetivo do jogo,  desarmar o explosivo.
 
-O número de Tedax e bancadas é configurável no começo do jogo, tendo um máximo de 10 tedax e 5 bancadas. Múltiplos Tedax podem se alinhar para usar as bancadas, cada Tedax só pode interagir com um módulo por vez, o jogo continua indefinidamente até que todos os módulos sejam desarmados, ou uma grande fila de módulos se acumule (causando um estado de emergência).
+O número de tedax e bancadas é fixo, sendo definido como 10 tedax e 3 bancadas disponíveis. No decorrer do jogo, múltiplos tedax podem aguardar na fila para utilizar as bancadas, sempre respeitando a regra que cada tedax só pode interagir com um módulo por vez. O jogo termina quando todos os 10 módulos são desarmados com sucesso. Caso contrário, ele continuará indefinidamente até que essa condição seja atendida.
 
 ## Fluxo do jogo
 1. Geração de módulos:
@@ -21,7 +21,6 @@ O número de Tedax e bancadas é configurável no começo do jogo, tendo um máx
 - t (Temporizador): Requer aguardar um tempo específico.
 2. Coordenação:
 - A thread “coordinator_func” permite ao jogador designar manualmente um módulo específico para um Tedax, uma bancada específica onde o módulo será desarmado.
-- Se nenhuma ação for tomada, os Tedax continuam a buscar módulos automaticamente.
 3. Desarmamento de módulos:
 - Cada Tedax, controlado pela thread “tedax_func”, monitora os módulos disponíveis.
 - Quando um módulo é atribuído:
@@ -31,10 +30,7 @@ O número de Tedax e bancadas é configurável no começo do jogo, tendo um máx
 - O módulo é marcado como desarmado.
 - A bancada é liberada para outro Tedax.
 4. Interface: 
-- A thread “display_func” atualiza continuamente a interface, exibindo os módulos pendentes, ocupados e em progresso, bancadas ocupadas e disponíveis, e o status do tedax.
-5. Fila de espera (Bônus):
-- Se todos os Tedax estiverem ocupados ou as bancadas estiverem indisponíveis:
-- Os Tedax aguardam em uma fila para obter acesso assim que os recursos forem liberados.
+- A thread “display_func” atualiza continuamente a interface, exibindo os módulos pendentes, em progresso e desarmados, status do tedax e quando há a conclusão do jogo, exibe uma mensagem de vitória.
 
 ## Threads
 - module_board_func: Gera novos módulos explosivos em intervalos fixos e os adiciona à fila de módulos.
@@ -108,3 +104,7 @@ Remova Todos os Diretórios Gerados:
 
 bash
 make distclean
+
+## Conclusão
+O projeto demonstra de forma prática os conceitos que foram aprendidos durante a matéria de programação concorrente no segundo semestre de 2024. A utilização de threads, mutex, semáforos permite a coordenação eficiente dos tedax e módulos com os recursos limitados disponíveis. A interface do ncurses foi essencial para a representação visual mais clara do estado do jogo, tornando uma experiência interativa e compreensível.
+Tudo que foi desenvolvido pelos alunos pode ser acessado através do repositório feito no GitHub através do link: https://github.com/touro3/Keep-Threading-Nobody-Explodes
