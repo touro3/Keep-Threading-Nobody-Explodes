@@ -31,12 +31,15 @@ O número de tedax e módulos é fixo, sendo definido como 3 tedax e 10 módulos
 - A bancada é liberada para outro Tedax.
 4. Interface: 
 - A thread “display_func” atualiza continuamente a interface, exibindo os módulos pendentes, em progresso e desarmados, status do tedax e quando há a conclusão do jogo, exibe uma mensagem de vitória.
+5. Temporizador:
+- A “timer_func” é responsável por diminuir o tempo disponível para desarmar os módulos de forma contínua. A cada segundo, a thread reduz o tempo restante e sinaliza quando o tempo acabou, impactando diretamente a continuidade do jogo. Caso o tempo expire antes de o jogador desarmar todos os módulos, o jogo é encerrado, sinalizando derrota.
 
 ## Threads
 - module_board_func: Gera novos módulos explosivos em intervalos fixos e os adiciona à fila de módulos.
 - display_func: Atualiza a interface do jogo em tempo real, exibindo informações sobre os módulos, Tedax e bancadas.
 - coordinator_func: Coordena manualmente a designação de módulos aos Tedax e bancadas.
 - tedax_func: Representa cada Tedax, que espera por um módulo disponível e interage com ele até desarmá-lo.
+- timer_func: Responsável por gerenciar o tempo restante para o fim do jogo. Ela pode ser usada para implementar a contagem regressiva do tempo, e quando o tempo acabar, ela sinaliza que o jogo terminou.
 - Principal (main): Responsável por iniciar e finalizar as threads e gerenciar a configuração inicial.
 
 ## Seções críticas
@@ -106,5 +109,5 @@ bash
 make distclean
 
 ## Conclusão
-O projeto demonstra de forma prática os conceitos que foram aprendidos durante a matéria de programação concorrente no segundo semestre de 2024. A utilização de threads, mutex, semáforos permite a coordenação eficiente dos tedax e módulos com os recursos limitados disponíveis. A interface do ncurses foi essencial para a representação visual mais clara do estado do jogo, tornando uma experiência interativa e compreensível.
+O projeto demonstra de forma prática os conceitos que foram aprendidos durante a matéria de programação concorrente no segundo semestre de 2024. A utilização de threads, mutex, semáforos, temporizador, permitindo a coordenação eficiente dos tedax e módulos com os recursos limitados disponíveis. A interface do ncurses foi essencial para a representação visual mais clara do estado do jogo, tornando uma experiência interativa e compreensível.
 Tudo que foi desenvolvido pelos alunos pode ser acessado através do repositório feito no GitHub através do link: https://github.com/touro3/Keep-Threading-Nobody-Explodes
