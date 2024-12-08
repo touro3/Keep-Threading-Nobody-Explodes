@@ -1,11 +1,19 @@
 #include <stdlib.h>
 #include <pthread.h>
+#include <string.h>
 #include "module_board.h"
 #include "utils.h"
 
 extern Module module_queue[MAX_MODULES];
 extern int num_modules;
 extern pthread_mutex_t module_queue_lock;
+
+pthread_mutex_t message_lock = PTHREAD_MUTEX_INITIALIZER;
+char temporary_message[256] = "Bem-vindo ao jogo!";
+
+// Mutex e array para ações dos Tedax
+pthread_mutex_t tedax_action_lock = PTHREAD_MUTEX_INITIALIZER;
+char tedax_actions[NUM_TEDAX][256];
 
 int count_modules(ModuleStatus status) {
     int count = 0;
