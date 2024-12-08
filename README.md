@@ -10,7 +10,7 @@ Para o trabalho final da disciplina, foi requerido a criação de um sistema que
 ## Explicação e mecânica do jogo
 O jogo simula uma situação de emergência onde se deve desarmar uma bomba antes do término do tempo, ela contém diferentes tipos de módulos explosivos e um número limitado de bancadas. É preciso um grande nível de coordenação para que o jogador consiga cumprir com o objetivo do jogo,  desarmar o explosivo.
 
-O número de tedax e bancadas é fixo, sendo definido como 10 tedax e 3 bancadas disponíveis. No decorrer do jogo, múltiplos tedax podem aguardar na fila para utilizar as bancadas, sempre respeitando a regra que cada tedax só pode interagir com um módulo por vez. O jogo termina quando todos os 10 módulos são desarmados com sucesso. Caso contrário, ele continuará indefinidamente até que essa condição seja atendida.
+O número de tedax e módulos é fixo, sendo definido como 3 tedax e 10 módulos disponíveis. No decorrer do jogo, múltiplos tedax podem aguardar na fila para utilizar as bancadas, sempre respeitando a regra que cada tedax só pode interagir com um módulo por vez. O jogo termina quando todos os 10 módulos são desarmados com sucesso. Caso contrário, ele continuará indefinidamente até que essa condição seja atendida.
 
 ## Fluxo do jogo
 1. Geração de módulos:
