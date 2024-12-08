@@ -34,6 +34,7 @@ int main() {
         pthread_create(&tedax_threads[i], NULL, tedax_func, (void *)(long)i);
     }
 
+
     // Join threads
     pthread_join(module_board_thread, NULL);
     pthread_join(display_thread, NULL);

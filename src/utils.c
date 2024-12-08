@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <pthread.h>
+#include <ncurses.h>
 #include "module_board.h"
 #include "utils.h"
 
@@ -28,4 +29,22 @@ int count_modules(ModuleStatus status) {
 
 int generate_random(int min, int max) {
     return min + rand() % (max - min + 1);
+}
+
+void desenha_bomba(int linha, int coluna) {
+    mvprintw(linha, coluna, "                        $#     #     #¢");
+    mvprintw(linha + 1, coluna, "           #######       #¢   #   ø#");
+    mvprintw(linha + 2, coluna, "          ##    ø###      oø  ø  øo");
+    mvprintw(linha + 3, coluna, "          #7       ###      1   1    1o");
+    mvprintw(linha + 4, coluna, "       #######       ###7        1o###ø");
+    mvprintw(linha + 5, coluna, "       #######         ########  1");
+    mvprintw(linha + 6, coluna, "     o#########ø                  o$¢");
+    mvprintw(linha + 7, coluna, "   ###############          ¢  1ø   1##");
+    mvprintw(linha + 8, coluna, "  #################o       1$   #");
+    mvprintw(linha + 9, coluna, " ###################       #    o#");
+    mvprintw(linha + 10, coluna, " ####################     ##");
+    mvprintw(linha + 11, coluna, "  ##################");
+    mvprintw(linha + 12, coluna, "   ################");
+    mvprintw(linha + 13, coluna, "     ############");
+    mvprintw(linha + 14, coluna, "       ########");
 }

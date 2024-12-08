@@ -21,4 +21,6 @@ extern char tedax_actions[NUM_TEDAX][256]; // Ações realizadas por cada Tedax
 int generate_random(int min, int max);
 int count_modules(ModuleStatus status);
 
+void desenha_bomba(int linha, int coluna);
+
 #endif

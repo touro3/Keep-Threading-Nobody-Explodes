@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdlib.h> // Para evitar warnings sobre exit()
 
+
 // Função para inicializar o display
 void inicializa_display() {
     initscr();
@@ -42,6 +43,8 @@ void *display_func(void *args) {
         mvprintw(2, 0, "| Módulos em progresso: %d", count_modules(IN_PROGRESS));
         mvprintw(3, 0, "| Módulos desarmados: %d", count_modules(DISARMED));
         mvprintw(4, 0, "+----------------------------------------------------------+");
+
+        desenha_bomba(0, 70);
 
         // Verifica se todos os módulos foram desarmados
         if (count_modules(DISARMED) == 10) { // Considerando 10 módulos no total
