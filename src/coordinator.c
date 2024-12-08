@@ -1,21 +1,21 @@
-#include "module_board.h" // Deve vir primeiro, pois define ModuleStatus
-#include "utils.h"        // Depende de module_board.h
 #include "tedax.h"
 #include "coordinator.h"
+#include "module_board.h"
+#include "utils.h"
 #include <ncurses.h>
 #include <pthread.h>
 #include <semaphore.h>
 #include <unistd.h>
 
+// Semáforo para controle de input
 extern sem_t input_ready;
 
+// Função de coordenação
 void *coordinator_func(void *args) {
     (void)args;
-    char status_message[256] = "";
-    int message_timer = 0;
 
     while (1) {
-        sem_wait(&input_ready); // Aguarda sinal de input
+        sem_wait(&input_ready); // Aguarda sinal para processar input
 
         pthread_mutex_lock(&module_queue_lock);
         int pending_index = -1;
@@ -30,19 +30,22 @@ void *coordinator_func(void *args) {
         pthread_mutex_unlock(&module_queue_lock);
 
         if (pending_index == -1) {
-            snprintf(status_message, sizeof(status_message),
-                     "Nenhum módulo pendente.");
-            message_timer = 3;
+            pthread_mutex_lock(&message_lock);
+            snprintf(temporary_message, sizeof(temporary_message), "Nenhum módulo pendente no momento.");
+            pthread_mutex_unlock(&message_lock);
             sleep(1);
             continue;
         }
 
         // Solicita o input do jogador
-        mvprintw(LINES - 3, 0, "Módulo %d disponível. Escolha Tedax (0-%d): ",
+        int tedax_input = -1;
+        pthread_mutex_lock(&message_lock);
+        snprintf(temporary_message, sizeof(temporary_message), "Módulo %d disponível. Escolha Tedax (0-%d): ",
                  module_queue[pending_index].id, NUM_TEDAX - 1);
-        refresh();
+        pthread_mutex_unlock(&message_lock);
 
-        int tedax_input = getch() - '0';
+        refresh(); // Atualiza o display
+        tedax_input = getch() - '0'; // Recebe input do jogador
 
         if (tedax_input >= 0 && tedax_input < NUM_TEDAX) {
             pthread_mutex_lock(&tedax_list[tedax_input].lock);
@@ -54,33 +57,40 @@ void *coordinator_func(void *args) {
                 pthread_mutex_unlock(&module_queue_lock);
 
                 tedax_list[tedax_input].is_available = 0;
-                snprintf(status_message, sizeof(status_message),
+
+                // Atualiza mensagem de atribuição
+                pthread_mutex_lock(&message_lock);
+                snprintf(temporary_message, sizeof(temporary_message),
                          "Módulo %d atribuído ao Tedax %d!",
                          module_queue[pending_index].id, tedax_input);
-                message_timer = 3;
+                pthread_mutex_unlock(&message_lock);
+
+                // Atualiza ações do Tedax
+                pthread_mutex_lock(&tedax_action_lock);
+                snprintf(tedax_actions[tedax_input], sizeof(tedax_actions[tedax_input]),
+                         "Tedax %d desarmando módulo %d...", tedax_input, module_queue[pending_index].id);
+                pthread_mutex_unlock(&tedax_action_lock);
+
             } else {
-                snprintf(status_message, sizeof(status_message),
+                // Tedax está ocupado
+                pthread_mutex_lock(&message_lock);
+                snprintf(temporary_message, sizeof(temporary_message),
                          "Tedax %d está ocupado!", tedax_input);
-                message_timer = 3;
+                pthread_mutex_unlock(&message_lock);
             }
 
             pthread_mutex_unlock(&tedax_list[tedax_input].lock);
         } else {
-            snprintf(status_message, sizeof(status_message),
-                     "Entrada inválida!");
-            message_timer = 3;
+            // Entrada inválida
+            pthread_mutex_lock(&message_lock);
+            snprintf(temporary_message, sizeof(temporary_message), "Entrada inválida!");
+            pthread_mutex_unlock(&message_lock);
         }
 
         refresh();
-
-        // Exibe a mensagem temporária
-        if (message_timer > 0) {
-            mvprintw(LINES - 2, 0, "%s", status_message);
-            refresh();
-            sleep(1);
-            message_timer--;
-        }
-        sem_post(&input_ready);
+        sem_post(&input_ready); // Libera para novo input
+        sleep(1);
     }
+
     return NULL;
 }
