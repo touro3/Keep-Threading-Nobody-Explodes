@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include "module_board.h"
 
-extern sem_t module_slots; // Semáforo para slots de módulos
+extern sem_t module_slots;
 extern sem_t input_ready;
 
 Module module_queue[MAX_MODULES];
@@ -16,7 +16,7 @@ pthread_mutex_t module_queue_lock = PTHREAD_MUTEX_INITIALIZER;
 void *module_board_func(void *args) {
     (void)args;
     while (1) {
-        sem_wait(&module_slots); // Aguarda um slot disponível para criar um novo módulo
+        sem_wait(&module_slots);
         pthread_mutex_lock(&module_queue_lock);
 
         if (num_modules < MAX_MODULES) {
@@ -26,7 +26,6 @@ void *module_board_func(void *args) {
                 .status = PENDING
             };
 
-            // Determina o tipo do módulo
             int type_choice = rand() % 3;
             if (type_choice == 0) {
                 new_module.type = 'x';
@@ -45,8 +44,8 @@ void *module_board_func(void *args) {
         }
 
         pthread_mutex_unlock(&module_queue_lock);
-        sem_post(&input_ready); // Notifica o coordenador que há um novo módulo
-        sleep(2); // Pequena pausa para evitar excesso de criação
+        sem_post(&input_ready);
+        sleep(2);
     }
     return NULL;
 }
