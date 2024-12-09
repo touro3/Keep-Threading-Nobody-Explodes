@@ -57,7 +57,7 @@ O número de tedax e módulos é fixo, sendo definido como 3 tedax e 10 módulos
 Comandos Disponíveis
 Compilar o Projeto:
 
-```bash
+bash
 make
 O binário será gerado em bin/game.
 Executar o Jogo:
