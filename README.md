@@ -5,7 +5,7 @@
 - Tiago de Jesus Chehab – 2211194
 
 ## Introdução
-Para o trabalho final da disciplina, foi requerido a criação de um sistema que simule o jogo “Keep Solving and Nobody Explodes”, nesta simulação é necessário apenas um jogador que precisará desarmar uma bomba. O documento detalha a  implementação da estrutura do jogo usando a concorrência e foi feita na linguagem de programação C. Na execução utiliza-se de threads, seções críticas e sincronização para garantir o funcionamento correto do jogo.
+Para o trabalho final da disciplina, foi requerido a criação de um sistema que simule o jogo “Keep Talking and Nobody Explodes”, nesta simulação é necessário apenas um jogador que precisará desarmar uma bomba. O documento detalha a  implementação da estrutura do jogo usando a concorrência e foi feita na linguagem de programação C. Na execução utiliza-se de threads, seções críticas e sincronização para garantir o funcionamento correto do jogo.
 
 ## Explicação e mecânica do jogo
 O jogo simula uma situação de emergência onde se deve desarmar uma bomba antes do término do tempo, ela contém diferentes tipos de módulos explosivos e um número limitado de bancadas. É preciso um grande nível de coordenação para que o jogador consiga cumprir com o objetivo do jogo,  desarmar o explosivo.
